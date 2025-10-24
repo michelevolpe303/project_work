@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrati - Carta</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <img id="logo" src="/img/logo.png" alt="Logo aziendale" />
+  </header>
+
+  <main>
+    <div class="login-box">
+      <h2>Registrati</h2>
+      <form id="registerForm">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" required />
+
+        <label for="cognome">Cognome</label>
+        <input type="text" id="cognome" name="cognome" required />
+
+        <label for="username">Nome utente</label>
+        <input type="text" id="username" name="username" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+
+        <label for="alias">Alias del conto</label>
+        <input type="text" id="alias" name="alias" required />
+
+        <button type="submit">Registrati</button>
+      </form>
+
+      <div class="link">
+        Hai già un account? <a href="/login">Accedi</a>
+      </div>
+
+      <div id="message" style="color:red; margin-top:10px;"></div>
+    </div>
+  </main>
+
+  <script>
+    $(document).ready(function() {
+      $('#registerForm').submit(function(e) {
+        e.preventDefault(); // Blocca il submit normale
+
+        // Prepara i dati del form
+        const formData = {
+          nome: $('#nome').val(),
+          cognome: $('#cognome').val(),
+          username: $('#username').val(),
+          password: $('#password').val(),
+          alias: $('#alias').val()
+        };
+
+        $.ajax({
+          url: '/register',
+          type: 'POST',
+          data: formData,
+          success: function(response) {
+            // Registrazione avvenuta con successo, reindirizza a /login
+            window.location.href = '/login';
+          },
+          error: function(xhr) {
+            // Mostra messaggio di errore
+            $('#message').text(xhr.responseText);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

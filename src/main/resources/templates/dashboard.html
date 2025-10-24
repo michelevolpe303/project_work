@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Carta</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f7f9fa;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: aliceblue;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+        border-top: 2px solid #41b782; /* puoi cambiare colore/spessore */
+        width: 90%;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        margin-top: 40px;
+        padding: 10px;
+    }
+
+    button, select {
+        background: none;
+        border: none;
+        padding: 10px 30px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 25px;
+        font-weight: bold;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    select {
+        background-color: transparent;
+        border: 1px solid #41b782;
+        padding: 10px 30px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 25px;
+        font-weight: bold;
+        color: black;
+        appearance: none; /* elimina stile di default */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3csvg%20width%3d%2210%22%20height%3d%227%22%20viewBox%3d%220%200%2010%207%22%20xmlns%3d%22http%3a//www.w3.org/2000/svg%22%3e%3cpath%20d%3d%22M0%200l5%207%205-7z%22%20fill%3d%22%2341b782%22/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        background-size: 10px 7px;
+    }
+    
+    #menu {
+        display: flex;
+        flex-direction: row;
+        gap: 30px;
+    }
+
+    select:hover {
+        background-color: #41b782;
+        color: white;
+        border-color: #2f8e68;
+    }
+
+    button:hover, select:hover {
+        background-color: #41b782;
+    }
+
+    button#login-button {
+        border: 1px solid #000;
+    }
+
+    #transactions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #transactions button {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        border: 1px solid #41b782;
+    }
+
+    #logo {
+      height: 80px;
+    }
+
+    #showBalanceBtn {
+      border: none;
+      padding: 10px 20px;
+      color: #41b782;
+      font-weight: bold;
+      background-color: transparent;
+      cursor: pointer;
+      transition: color 0.3s;
+      align-self: flex-end;
+    }
+
+    #showBalanceBtn:hover,
+    #showBalanceBtn:focus {
+      color: #2f8e68;
+      outline: none;
+    }
+
+    #cardInfo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0 20px;
+        margin-bottom: 50px;
+    }
+
+    .card,
+    .cardDetails {
+        border-radius: 20px;
+        color: black;
+        
+        box-sizing: border-box;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+        aspect-ratio: 1.62;
+        height: 300px;
+        background-image: linear-gradient(to bottom right, #74daac, #1d7b52);
+        border: 1px solid black;
+    }
+
+    .card img {
+        padding: 10px;
+        width: 45%;
+    }
+
+    .card h3 {
+        font-size: xx-large;
+        color: white;
+        width: 90%;
+        font-weight: normal;
+        text-align: center;
+        margin: 0 auto; 
+        margin-top: 15px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .card h4 {
+        color: white;
+        width: 90%;
+        text-align: center;
+        font-weight: normal;
+        margin: 0 auto; 
+        margin-top: 3px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    #iban {
+        text-align: left;
+        margin-top: 40px;
+    }
+
+    .cardDetails {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 400px;
+        padding: 30px;
+        background: linear-gradient(to bottom right, #74daac, #1d7b52);
+        border: 1px solid #000;
+    }
+
+    .cardDetails h2 {
+        margin: 0 0 10px 0;
+        border-top: 2px solid black; /* puoi cambiare colore/spessore */
+        color: white;
+    }
+
+    .cardDetailItem {
+        margin-bottom: 10px;
+        margin-left: 10px;
+        padding: 10px;
+        font-size: 1rem;
+        font-size: xx-large;
+        color: white;
+        font-family: 'Courier New', Courier, monospace;
+        border-radius: 10px;
+    }
+
+
+    table {
+        font-family: Arial, sans-serif;
+        border-collapse: collapse;
+        width: 90%;
+        margin: 0 auto;
+        background: linear-gradient(to bottom right, #e6f9f2, #d0f0e5);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    td, th {
+        border: 1px solid #b2dfc3;
+        text-align: left;
+        padding: 12px 16px;
+        color: black;
+        background-color: rgba(255, 255, 255, 0.85);
+    }
+
+    th {
+        background-color: #41b782;
+        color: black;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #operations {
+        display: flex;
+        flex-direction: row;
+        gap: 30px;
+        margin: 40px;
+        width: 80%;
+        margin: 0 auto;
+        margin-bottom: 50px;
+    }
+
+    .operationItem {
+        width: 70px;
+    }
+
+    .operationItem div{
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        font-size: small;
+        text-align: center;
+    }
+
+    .operationImg {
+        border-radius: 50%;
+        background-color: #41b782;
+        width: 70px;
+        aspect-ratio: 1;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    .operationImg:hover {
+        background-color: #2f8e68;
+    }
+
+    #filterContainer {
+      width: 90%;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #filterContainer label {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .alert-success {
+      width: 90%;
+      margin: 20px auto;
+      padding: 15px 20px;
+      background: rgba(65, 183, 130, 0.15);
+      border: 1px solid #41b782;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #2f8e68;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .operationForm {
+        width: 90%;
+        max-width: 90%;
+        margin: 0 auto 50px auto; /* auto centra orizzontalmente */
+        background: linear-gradient(to bottom right, #e6f9f2, #d0f0e5);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* centra i contenuti dentro */
+    }
+
+    .operationForm label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .operationForm input[type="number"],
+    .operationForm input[type="text"] {
+        width: 50%;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        border: 1px solid #b2dfc3;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    .operationForm input[type="submit"] {
+        background-color: transparent;
+        border: 1px solid #41b782;
+        padding: 10px 30px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 25px;
+        font-weight: bold;
+        color: black;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    .operationForm input[type="submit"]:hover {
+        background-color: #41b782;
+        color: white;
+        border-color: #2f8e68;
+    }
+
+    #counterContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+#counterContainer span {
+  font-size: 1.5em;
+  font-weight: bold;
+  min-width: 80px;
+  text-align: center;
+  display: inline-block;
+}
+
+.counterBtn {
+  background-color: #41b782;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.5em;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.counterBtn:hover {
+  background-color: #2f8e68;
+}
+
+#opzioniPrestito {
+    background: linear-gradient(to bottom right, #e6f9f2, #d0f0e5);
+    padding: 20px 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#opzioniPrestito label {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#opzioniPrestito label:hover {
+    background-color: rgba(65, 183, 130, 0.2);
+}
+
+#opzioniPrestito input[type="radio"] {
+    accent-color: #41b782; /* colore coerente con la palette */
+}
+
+#opzioniPrestito input[type="submit"] {
+    background-color: transparent;
+    border: 1px solid #41b782;
+    padding: 10px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 25px;
+    font-weight: bold;
+    color: black;
+    align-self: flex-start;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#opzioniPrestito input[type="submit"]:hover {
+    background-color: #41b782;
+    color: white;
+    border-color: #2f8e68;
+}
+
+#prestitiTable {
+  width: 100%;        /* occupa tutto lo spazio del contenitore */
+  max-width: 100%;    /* mai più larga del genitore */
+  table-layout: auto; /* colonne adattive */
+}
+
+#prestitiTable th,
+#prestitiTable td {
+  white-space: nowrap;  /* niente a capo */
+}
+
+
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="dashboard.js"></script>
+</head>
+
+<body>
+  <header>
+    <img id="logo" src="/img/logo.png" alt="Logo aziendale" />
+    <div id="menu">
+        <button id="apri-conto-button">Apri un conto</button>
+        <select id="conto-select">
+          <option disabled th:if="${#authentication.principal.aliasCorrente == null}" selected>-- Seleziona un conto --</option>
+          <option th:each="alias : ${#authentication.principal.aliasList}"
+                  th:value="${alias}"
+                  th:text="${alias}"
+                  th:selected="${alias == #authentication.principal.aliasCorrente}">
+          </option>
+        </select>
+        <button id="logout-button">Logout</button>
+    </div>
+  </header>
+
+  <p th:if="${param.successo}" class="alert-success">
+    Operazione eseguita con successo!
+  </p>
+
+  <h2>La tua carta</h2>
+
+  <main>
+
+    <section id="cardInfo">
+      <div class="card">
+            <img src="/img/logo-white.png" alt="">
+            <h3><span sec:authentication="principal.panSpaced"></span></h3>
+            <h4> VALID THRU <span sec:authentication="principal.scadenza"></span></h4>
+            <h4>CVV: <span sec:authentication="principal.conto.cvv"></span></h4>
+            <h4 id="iban">IBAN: <span sec:authentication="principal.conto.iban"></span></h4>
+      </div>
+
+      <div class="cardDetails">
+        <h2>Saldo Carta</h2>
+        <div class="cardDetailItem">
+          €<span th:text="${T(java.lang.String).format('%.2f', #authentication.principal.conto.saldo)}"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <h2>Operazioni</h2>
+  <section id="operations">
+    <div class="operationItem">
+        <img class="operationImg" src="/img/invia.png" id="toggleFormInviaDenaro"></img>
+        <div>Invia Denaro</div>
+    </div>
+    <div class="operationItem">
+        <img class="operationImg" src="/img/prestito.png" id="toggleFormRichiediPrestito"></img>
+        <div>Richiedi un prestito</div>
+    </div>
+    <div class="operationItem">
+      <img class="operationImg" src="/img/list-solid-full.png" id="toggleGestisciPrestiti"></img>
+      <div>Gestisci prestiti</div>
+  </div>
+  </section>
+
+  <form id="formInviaDenaro" class="operationForm" action="/api/inviaDenaro" method="POST">
+    <label for="iban-alias"> Inserisci il codice IBAN o l'alias del conto a cui inviare denaro: </label>
+    <input type="text" name="destinatario" required><br>
+    <label for="importo"> Inserisci l'importo da inviare: </label>
+    <input type="number" name="importo" step="0.01" min="0"><br>
+    <label for="importo"> Inserisci la descrizione: </label>
+    <input type="text" name="descrizione"><br>
+    <input type="submit" name="sub" id="">
+  </form>
+
+  <div id="formRichiediPrestito" class="operationForm">
+    <label for="importo"> Inserisci l'importo richiesto: </label>
+    <div id="counterContainer">
+      <button type="button" class="counterBtn" id="decrement">−</button>
+      <span id="importoValore">5000</span>
+      <button type="button" class="counterBtn" id="increment">+</button>
+    </div>
+
+      <form id="opzioniPrestito" method="post" action="/api/prestito/richiedi">
+
+    
+      </form>
+
+    </div>
+
+    <div id="formPrestiti" class="operationForm">
+      <h3>Prestiti in corso</h3>
+      <table id="prestitiTable">
+          <thead>
+              <tr>
+                  <th>Importo</th>
+                  <th>Numero Rate</th>
+                  <th>TAEG</th>
+                  <th>Rata Mensile</th>
+                  <th>Importo Pagato</th>
+                  <th>Azioni</th>
+              </tr>
+          </thead>
+          <tbody>
+              
+          </tbody>
+      </table>
+  </div>
+
+  <h2>Lista transazioni</h2>
+  <section id="transactions">
+    <div id="filterContainer">
+      <label for="filterSelect">Filtra:</label>
+      <select id="filterSelect">
+        <option value="tutte">Tutte</option>
+        <option value="entrate">Entrate</option>
+        <option value="uscite">Uscite</option>
+      </select>
+    </div>
+    
+      
+    <table id="transazioni">
+        <tr>
+          <th>Descrizione</th>
+          <th>Data</th>
+          <th>Importo</th>
+        </tr>
+
+      </table>
+      <button id="transazioni-button">Carica altri</button>
+  </section>
+</body>
+</html>

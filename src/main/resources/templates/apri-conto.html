@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Carta</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $('form[action="/api/conto/crea"]').on('submit', function(e) {
+      e.preventDefault(); // blocca il comportamento standard
+
+      const $form = $(this);
+      const formData = $form.serialize(); // username=...&password=...&alias=...
+
+      $.ajax({
+        url: $form.attr('action'), // /api/conto/crea
+        type: $form.attr('method'), // POST
+        data: formData,
+        // la risposta è testo semplice, non JSON
+        dataType: 'text'
+      })
+      .done(function(response, textStatus, jqXHR) {
+        // Se lo status è 201 CREATED → redirect a /
+        if (jqXHR.status === 201) {
+          window.location.href = '/';
+        } else {
+          // fallback, se lo status non è 201
+          $form.find('p').text(response);
+        }
+      })
+      .fail(function(xhr) {
+        // Se lo status è 403 (FORBIDDEN) → mostra messaggio
+        const msg = xhr.responseText || "Errore durante l'apertura del conto";
+        $form.find('p').text(msg);
+        console.error("Errore:", xhr.status, msg);
+      });
+    });
+  });
+  </script>
+</head>
+
+<body>
+  <header>
+    <img id="logo" src="/img/logo.png" alt="Logo aziendale" />
+  </header>
+
+  <main>
+    <div class="login-box">
+      <h2>Accedi al tuo profilo</h2>
+      <form action="/api/conto/crea" method="POST">
+        <p th:text="${param.error}">Default error</p>
+        <label for="username">Nome utente</label>
+        <input type="text" id="username" name="username" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+
+        <label for="alias">Alias del conto</label>
+        <input type="text" id="alias" name="alias" required />
+
+        <button type="submit">Apri il conto</button>
+      </form>
+
+      <div class="link">
+        <a href="/">Torna alla dashboard</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
