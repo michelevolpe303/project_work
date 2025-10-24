@@ -1,0 +1,37 @@
+-- Inserimento Transazioni
+INSERT INTO Transazione (ref_mittente, ref_destinatario, descrizione, importo, data_t) VALUES
+-- 11 iniziali
+(1,2,'Bonifico',250,'2025-08-03'),
+(1,2,'Pagamento POS - Supermercato',-54,'2025-08-02'),
+(1,2,'Ricarica Telefonica',-10,'2025-08-01'),
+(2,1,'Accredito Stipendio',1500,'2025-07-31'),
+(1,2,'Pagamento Netflix',-12,'2025-07-30'),
+(1,2,'Acquisto Amazon',-89,'2025-07-29'),
+(1,2,'Bonifico in uscita',-200,'2025-07-28'),
+(1,2,'Prelievo Bancomat',-100,'2025-07-26'),
+(1,2,'Pagamento POS - Ristorante',-65,'2025-07-25'),
+(2,1,'Cashback',5,'2025-07-24'),
+(2,1,'Rimborso Spese',120,'2025-07-23'),
+
+-- 20 aggiuntive
+(1,2,'Pagamento Bolletta Luce',-75,'2025-07-22'),
+(1,2,'Pagamento Bolletta Gas',-68,'2025-07-21'),
+(2,1,'Interesse Attivo Mensile',15,'2025-07-20'),
+(1,2,'Abbonamento Spotify',-9,'2025-07-19'),
+(1,2,'Pagamento POS - Benzina',-45,'2025-07-18'),
+(1,2,'Acquisto eBay',-32,'2025-07-17'),
+(2,1,'Rimborso Viaggio',200,'2025-07-16'),
+(1,2,'Pagamento Cinema',-22,'2025-07-15'),
+(1,2,'Donazione ONG',-30,'2025-07-14'),
+(2,1,'Premio Aziendale',500,'2025-07-13'),
+(1,2,'Pagamento POS - Libreria',-18,'2025-07-12'),
+(1,2,'Acquisto Zalando',-59,'2025-07-11'),
+(2,1,'Rimborso Assicurazione',150,'2025-07-10'),
+(1,2,'Pagamento POS - Bar',-8,'2025-07-09'),
+(1,2,'Ricarica PayPal',-100,'2025-07-08'),
+(2,1,'Vendita Usato',85,'2025-07-07'),
+(1,2,'Biglietto Treno',-42,'2025-07-06'),
+(1,2,'Acquisto Apple Store',-299,'2025-07-05'),
+(2,1,'Cashback Carta',10,'2025-07-04'),
+(1,2,'Pagamento POS - Palestra',-39,'2025-07-03'),
+(1,2,'Prelievo Bancomat',-50,'2025-07-02');
