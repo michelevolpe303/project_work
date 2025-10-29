@@ -1,671 +1,478 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
-  title: Fintech Demo API
-  version: "1.0.0"
-  description: |
-    # Fintech Demo API
-    
-    API completa per la gestione di un sistema bancario digitale che include:
-    - Registrazione e autenticazione utenti
-    - Gestione multi-conto
-    - Sistema di prestiti con calcolo automatico delle opzioni
-    - Transazioni P2P (peer-to-peer)
-    - Storico transazioni con paginazione
-    
-    ## Autenticazione
-    L'API utilizza l'autenticazione basata su cookie di sessione (JSESSIONID).
-    Dopo il login, il cookie viene automaticamente incluso nelle richieste successive.
-    
-    ## Flusso tipico
-    1. **Registrazione**: POST `/register` - Crea utente e conto principale
-    2. **Login**: Accedi tramite form `/login` (gestito da Spring Security)
-    3. **Operazioni**: Usa gli endpoint protetti con il cookie di sessione
-    
-  contact:
-    name: Supporto API
-    email: support@example.com
-  license:
-    name: Apache 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0.html
-
+  title: OpenAPI definition
+  version: v0
 servers:
-  - url: http://localhost:8080
-    description: Server di sviluppo locale
-
-tags:
-  - name: Auth & Users
-    description: Operazioni di registrazione e gestione utenti
-  - name: Conti
-    description: Gestione conti correnti e operazioni correlate
-  - name: Prestiti
-    description: Richiesta e gestione prestiti personali
-  - name: Transazioni
-    description: Storico movimenti e transazioni
-  - name: Pagamenti
-    description: Invio denaro tra utenti
-
+- url: http://localhost:8080
+  description: Generated server url
 paths:
   /register:
     post:
-      tags: [Auth & Users]
-      summary: Registrazione Utente
-      description: |
-        L'endpoint di registrazione consente la creazione di un nuovo utente nel sistema.
-        Al momento della registrazione, il sistema genera automaticamente un conto corrente 
-        associato all'utente, utilizzando l'alias fornito.
-        
-        **Parametri richiesti**: nome, cognome, username, password e alias
-        
-        **Esempio**: Un utente con nome "Mario Rossi" potrebbe registrarsi utilizzando 
-        l'identificativo "mrossi" e creare un conto denominato "Conto Principale".
-        
-        **Note**:
-        - La password viene automaticamente hashata con BCrypt
-        - L'username deve essere univoco nel sistema
+      tags:
+      - utente-controller
+      summary: Registra un nuovo utente
+      description: Crea un nuovo utente con i dati forniti e associa un conto principale
+        con alias scelto.
       operationId: registerUser
-      requestBody:
+      parameters:
+      - name: nome
+        in: query
+        description: Nome dell'utente
         required: true
-        description: Dati per la registrazione del nuovo utente
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              required: [nome, cognome, username, password, alias]
-              properties:
-                nome: 
-                  type: string
-                  description: Nome dell'utente
-                  example: "Mario"
-                cognome: 
-                  type: string
-                  description: Cognome dell'utente
-                  example: "Rossi"
-                username: 
-                  type: string
-                  description: Username univoco per il login
-                  example: "mrossi"
-                password: 
-                  type: string
-                  format: password
-                  description: Password per l'account
-                  example: "S3greta!"
-                alias: 
-                  type: string
-                  description: Nome del conto principale che verrà creato
-                  example: "Conto Principale"
+        schema:
+          type: string
+        example: Mario
+      - name: cognome
+        in: query
+        description: Cognome dell'utente
+        required: true
+        schema:
+          type: string
+        example: Rossi
+      - name: username
+        in: query
+        description: Username univoco
+        required: true
+        schema:
+          type: string
+        example: mrossi
+      - name: password
+        in: query
+        description: Password dell'account
+        required: true
+        schema:
+          type: string
+        example: password123
+      - name: alias
+        in: query
+        description: Alias del conto principale
+        required: true
+        schema:
+          type: string
+        example: Conto Principale
       responses:
         "201":
           description: Registrazione avvenuta con successo
           content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/MessageResponse"
-              example: 
-                message: "Registrazione avvenuta con successo"
-        "409":
-          description: Username già in uso
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorResponse"
-              example: 
-                error: "Il nome utente scelto è già in uso"
-
-  /api/conto/crea:
-    post:
-      tags: [Conti]
-      summary: Creazione nuovo conto
-      description: |
-        La creazione di ulteriori conti è possibile tramite questo endpoint.
-        L'operazione richiede l'autenticazione dell'utente mediante username e password, 
-        oltre all'indicazione dell'alias per il nuovo conto.
-        
-        **Esempio**: Creazione di un "Conto Risparmi"
-        
-        **Requisiti**:
-        - Utente deve essere autenticato tramite sessione
-        - Username e password devono corrispondere all'utente autenticato
-        - L'alias deve essere univoco nel sistema
-      operationId: createAccount
-      security: 
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              required: [username, password, alias]
-              properties:
-                username:
-                  type: string
-                  description: Username per conferma identità
-                  example: "mrossi"
-                password:
-                  type: string
-                  format: password
-                  description: Password per conferma identità
-                  example: "S3greta!"
-                alias:
-                  type: string
-                  description: Nome identificativo del nuovo conto
-                  example: "Conto Risparmi"
-      responses:
-        "201":
-          description: Conto creato
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/MessageResponse"
-              example: 
-                message: "Conto creato"
-        "403":
-          description: Non autorizzato a creare il conto
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorResponse"
-              example: 
-                error: "Non sei autorizzato a creare il conto"
-
-  /api/conto/cambia:
-    get:
-      tags: [Conti]
-      summary: Cambio del conto attivo
-      description: |
-        Per modificare il conto corrente attivo, specificare l'alias del conto da selezionare.
-        
-        **Comportamento**: Il conto selezionato diventa quello attivo per tutte le 
-        operazioni successive (transazioni, prestiti, ecc.).
-      operationId: switchAccount
-      security: 
-        - cookieAuth: []
-      parameters:
-        - name: alias
-          in: query
-          required: true
-          description: Alias del conto da attivare
-          schema: 
-            type: string
-            example: "Conto Risparmi"
-      responses:
-        "200":
-          description: Conto cambiato
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/MessageResponse"
-              example: 
-                message: "Conto cambiato"
-        "403":
-          description: Non autorizzato ad accedere al conto richiesto
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorResponse"
-              example: 
-                error: "Non sei autorizzato ad accedere al conto"
-
-  /api/conto:
-    get:
-      tags: [Conti]
-      summary: Recupero conto attivo
-      description: |
-        Consente di ottenere i dettagli relativi al conto attualmente attivo 
-        per l'utente autenticato.
-        
-        La risposta restituisce un oggetto ContoDTO contenente tutte le 
-        informazioni principali del conto.
-      operationId: getActiveAccount
-      security: 
-        - cookieAuth: []
-      responses:
-        "200":
-          description: Dettagli del conto attivo restituiti con successo
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ContoDTO"
-              example:
-                idConto: 101
-                alias: "Conto Principale"
-                iban: "IT60X0542811101000000123456"
-                saldo: 1520.75
-                pan: "4000123456789012"
-                annoScadenza: 2035
-                meseScadenza: 1
-                cvv: "123"
-                principale: true
-
-  /api/prestito/opzioni:
-    get:
-      tags: [Prestiti]
-      summary: Calcolo opzioni di prestito
-      description: |
-        Il sistema è in grado di calcolare e restituire le diverse opzioni di prestito 
-        disponibili in base all'importo richiesto.
-        
-        La risposta fornisce una lista di oggetti OpzionePrestito, contenente le varie 
-        soluzioni proposte (durata, tasso di interesse, numero di rate).
-        
-        **Calcolo**: 
-        - Opzioni disponibili da 12 a 48 rate (intervalli di 6 mesi)
-        - TAN fisso al 5%
-        - Spese obbligatorie: 2% dell'importo
-      operationId: getLoanOptions
-      security: 
-        - cookieAuth: []
-      parameters:
-        - name: importo
-          in: query
-          required: true
-          description: Importo del prestito richiesto (valore numerico double)
-          schema: 
-            type: number
-            format: double
-            minimum: 0
-            example: 10000
-      responses:
-        "200":
-          description: Lista delle opzioni di prestito disponibili
-          content:
-            application/json:
+            text/plain:
               schema:
-                type: array
-                items: 
-                  $ref: "#/components/schemas/OpzionePrestito"
-              example:
-                - numeroRate: 24
-                  tassoInteresseAnnuale: 6.5
-                  rataMensile: 356.40
-                  importoTotale: 8553.60
-
+                type: string
+                example: Registrazione avvenuta con successo.
+        "409":
+          description: Nome utente già in uso
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Il nome utente scelto è già in uso.
   /api/prestito/richiedi:
     post:
-      tags: [Prestiti]
-      summary: Richiesta di un prestito
-      description: |
-        Per inoltrare una nuova richiesta di prestito, l'utente invia i parametri 
-        importoRichiesto e numeroRate, che indicano rispettivamente la somma 
-        desiderata e il numero di rate per il rimborso.
-        
-        **Processo**:
-        1. Validazione dei parametri
-        2. Calcolo delle condizioni del prestito
-        3. Creazione del prestito
-        4. Accredito immediato dell'importo sul conto
-      operationId: requestLoan
-      security: 
-        - cookieAuth: []
-      requestBody:
+      tags:
+      - prestito-controller
+      summary: Richiede un prestito
+      description: Permette all’utente autenticato di richiedere un prestito specificando
+        importo e numero di rate.
+      operationId: richiediPrestito
+      parameters:
+      - name: importoRichiesto
+        in: query
+        description: Importo richiesto
         required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              required: [importoRichiesto, numeroRate]
-              properties:
-                importoRichiesto:
-                  type: number
-                  format: double
-                  description: Somma desiderata
-                  example: 8000
-                numeroRate:
-                  type: integer
-                  minimum: 1
-                  description: Numero di rate per il rimborso
-                  example: 36
+        schema:
+          type: integer
+          format: int32
+        example: 5000
+      - name: numeroRate
+        in: query
+        description: Numero di rate per il rimborso
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 24
       responses:
         "201":
           description: Prestito richiesto con successo
           content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/MessageResponse"
-              example: 
-                message: "Prestito richiesto con successo"
-
-  /api/prestiti:
-    get:
-      tags: [Prestiti]
-      summary: Elenco prestiti utente
-      description: |
-        Consente di ottenere l'elenco completo dei prestiti associati all'utente autenticato.
-        
-        Il sistema restituisce una lista di oggetti PrestitoDTO, ciascuno contenente 
-        i dettagli relativi a un singolo prestito.
-      operationId: getUserLoans
-      security: 
-        - cookieAuth: []
-      responses:
-        "200":
-          description: Lista dei prestiti dell'utente
-          content:
-            application/json:
+            text/plain:
               schema:
-                type: array
-                items: 
-                  $ref: "#/components/schemas/PrestitoDTO"
-              example:
-                - idPrestito: 123
-                  importoRichiesto: 8000
-                  numeroRate: 36
-                  tassoInteresseAnnuale: 6.9
-                  stato: "APPROVATO"
-                  rataMensile: 245.80
-                  residuo: 6789.10
-
+                type: string
+                example: Prestito richiesto con successo
   /api/prestiti/pagaRata/{idPrestito}:
     post:
-      tags: [Prestiti]
-      summary: Pagamento rata prestito
-      description: |
-        Per procedere al pagamento di una rata, l'utente specifica l'identificativo 
-        numerico del prestito da aggiornare.
-        
-        **Processo**:
-        1. Verifica che il prestito appartenga all'utente
-        2. Addebita l'importo della rata dal conto attivo
-        3. Aggiorna il totale pagato del prestito
-      operationId: payLoanInstallment
-      security: 
-        - cookieAuth: []
+      tags:
+      - prestito-controller
+      summary: Paga una rata di un prestito
+      description: Permette all’utente di pagare una rata del prestito identificato
+        da `idPrestito`.
+      operationId: pagaRata
       parameters:
-        - name: idPrestito
-          in: path
-          required: true
-          description: Identificativo numerico del prestito
-          schema: 
-            type: integer
-            minimum: 1
-            example: 123
+      - name: idPrestito
+        in: path
+        description: ID del prestito
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 1
       responses:
         "200":
           description: Rata pagata con successo
           content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/MessageResponse"
-              example: 
-                message: "Rata pagata con successo"
-        "403":
-          description: Prestito non valido o non appartiene all'utente
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorResponse"
-              example: 
-                error: "Prestito non valido o non tuo"
-
-  /api/transazioni/ottieni:
-    get:
-      tags: [Transazioni]
-      summary: Recupero transazioni
-      description: |
-        Permette di visualizzare l'elenco delle transazioni effettuate dall'utente autenticato.
-        
-        Il parametro richiesto è pagina, che specifica il numero della pagina da consultare.
-        
-        **Paginazione**:
-        - 10 transazioni per pagina
-        - Ordinate dalla più recente alla più vecchia
-      operationId: getTransactions
-      security: 
-        - cookieAuth: []
-      parameters:
-        - name: pagina
-          in: query
-          required: true
-          description: Numero della pagina da consultare
-          schema: 
-            type: integer
-            minimum: 1
-            example: 1
-      responses:
-        "200":
-          description: Lista di oggetti TransazioneDTO
-          content:
-            application/json:
+            text/plain:
               schema:
-                type: array
-                items: 
-                  $ref: "#/components/schemas/TransazioneDTO"
-              example:
-                - id: 9876
-                  data: "2025-10-24T12:30:00Z"
-                  importo: -25.50
-                  descrizione: "Pagamento cena"
-                  controparte: "lbianchi"
-                  tipo: "DEBITO"
-        "404":
-          description: Nessuna transazione trovata nella pagina richiesta
+                type: string
+                example: Rata pagata con successo
+        "403":
+          description: Prestito non valido o non appartiene all’utente
           content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorResponse"
-              example: 
-                error: "Nessuna transazione trovata"
-
+            text/plain:
+              schema:
+                type: string
+                example: Prestito non valido o non tuo
   /api/inviaDenaro:
     post:
-      tags: [Pagamenti]
-      summary: Invio denaro
-      description: |
-        Consente all'utente autenticato di inviare una somma di denaro a un altro 
-        utente del sistema.
-        
-        **Parametri necessari**:
-        - destinatario: username del ricevente
-        - importo: somma da trasferire
-        - descrizione: causale (es. "Pagamento cena")
-        
-        **Identificazione destinatario**:
-        - Per IBAN: formato standard italiano
-        - Per alias: nome del conto destinatario
-      operationId: sendMoney
-      security: 
-        - cookieAuth: []
-      requestBody:
+      tags:
+      - transazione-controller
+      summary: Invia denaro a un altro utente
+      description: "Permette all’utente autenticato di inviare denaro a un altro utente\
+        \ specificando destinatario, importo e descrizione."
+      operationId: inviaDenaro
+      parameters:
+      - name: destinatario
+        in: query
+        description: Username del destinatario
         required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              required: [destinatario, importo, descrizione]
-              properties:
-                destinatario:
-                  type: string
-                  description: Username del ricevente (o IBAN/alias del conto)
-                  example: "lbianchi"
-                importo:
-                  type: number
-                  format: double
-                  minimum: 0.01
-                  description: Somma da trasferire
-                  example: 25.50
-                descrizione:
-                  type: string
-                  description: Causale del trasferimento
-                  example: "Pagamento cena"
+        schema:
+          type: string
+        example: mrossi
+      - name: importo
+        in: query
+        description: Importo da inviare
+        required: true
+        schema:
+          type: number
+          format: double
+        example: 150.5
+      - name: descrizione
+        in: query
+        description: Descrizione della transazione
+        required: true
+        schema:
+          type: string
+        example: Pagamento cena
       responses:
         "201":
           description: Transazione eseguita con successo
           content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/MessageResponse"
-              example: 
-                message: "Transazione eseguita con successo"
+            text/plain:
+              schema:
+                type: string
+                example: Transazione eseguita con successo
         "400":
-          description: Parametri della richiesta non validi
+          description: Parametri non validi
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Parametri della richiesta non validi
+  /api/conto/crea:
+    post:
+      tags:
+      - conto-controller
+      summary: Crea un nuovo conto
+      description: Permette la creazione di un nuovo conto per l'utente autenticato
+        tramite username e password.
+      operationId: nuovoConto
+      parameters:
+      - name: username
+        in: query
+        description: Username dell'utente
+        required: true
+        schema:
+          type: string
+        example: mrossi
+      - name: password
+        in: query
+        description: Password dell'utente
+        required: true
+        schema:
+          type: string
+        example: password123
+      - name: alias
+        in: query
+        description: Alias del nuovo conto
+        required: true
+        schema:
+          type: string
+        example: Conto Risparmi
+      responses:
+        "201":
+          description: Conto creato con successo
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Conto creato
+        "403":
+          description: Utente non autorizzato a creare il conto
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Non sei autorizzato a creare il conto
+  /api/transazioni/ottieni:
+    get:
+      tags:
+      - transazione-controller
+      summary: Recupera le transazioni
+      description: "Restituisce una lista di transazioni per l’utente autenticato,\
+        \ paginata in base al parametro `pagina`."
+      operationId: getTransazioni
+      parameters:
+      - name: pagina
+        in: query
+        description: Numero della pagina di transazioni
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 1
+      responses:
+        "200":
+          description: Transazioni recuperate con successo
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorResponse"
-              example: 
-                error: "Parametri della richiesta non validi"
-
+              schema:
+                $ref: "#/components/schemas/TransazioneDTO"
+        "404":
+          description: Nessuna transazione trovata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransazioneDTO"
+  /api/prestito/opzioni:
+    get:
+      tags:
+      - prestito-controller
+      summary: Calcola le opzioni di prestito disponibili
+      description: "Restituisce una lista di opzioni di prestito (tasso, rate, importo)\
+        \ in base all'importo richiesto."
+      operationId: opzioniPrestito
+      parameters:
+      - name: importo
+        in: query
+        description: Importo per il quale calcolare le opzioni di prestito
+        required: true
+        schema:
+          type: number
+          format: double
+        example: 10000
+      responses:
+        "200":
+          description: Opzioni di prestito disponibili
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpzionePrestito"
+  /api/prestiti:
+    get:
+      tags:
+      - prestito-controller
+      summary: Lista dei prestiti dell’utente
+      description: Restituisce tutti i prestiti associati all’utente autenticato.
+      operationId: getPrestiti
+      responses:
+        "200":
+          description: Lista dei prestiti
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrestitoDTO"
+  /api/conto:
+    get:
+      tags:
+      - conto-controller
+      summary: Recupera il conto attivo
+      description: Restituisce le informazioni relative al conto attualmente selezionato
+        dall’utente autenticato.
+      operationId: getConto
+      responses:
+        "200":
+          description: Conto attivo recuperato con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContoDTO"
+        "403":
+          description: Non autorizzato ad accedere al conto attivo
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContoDTO"
+  /api/conto/cambia:
+    get:
+      tags:
+      - conto-controller
+      summary: Cambia conto attivo
+      description: Permette di selezionare un conto come attivo tramite alias.
+      operationId: cambiaConto
+      parameters:
+      - name: alias
+        in: query
+        description: Alias del conto da attivare
+        required: true
+        schema:
+          type: string
+        example: Conto Principale
+      responses:
+        "200":
+          description: Conto cambiato con successo
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Conto cambiato
+        "403":
+          description: Non autorizzato ad accedere al conto
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Non sei autorizzato ad accedere al conto
 components:
-  securitySchemes:
-    cookieAuth:
-      type: apiKey
-      in: cookie
-      name: JSESSIONID
-      description: |
-        Cookie di sessione Spring Security generato al login.
-        Viene automaticamente incluso nelle richieste dal browser.
-
   schemas:
-    MessageResponse:
-      type: object
-      properties:
-        message: 
-          type: string
-          description: Messaggio di conferma dell'operazione
-          example: "Operazione completata con successo"
-
-    ErrorResponse:
-      type: object
-      properties:
-        error: 
-          type: string
-          description: Descrizione dell'errore
-          example: "Si è verificato un errore"
-
-    ContoDTO:
-      type: object
-      description: Rappresenta un conto corrente con i suoi dettagli
-      properties:
-        idConto: 
-          type: integer
-          description: ID univoco del conto
-          example: 101
-        alias: 
-          type: string
-          description: Nome identificativo del conto
-          example: "Conto Principale"
-        iban: 
-          type: string
-          description: Codice IBAN del conto
-          example: "IT60X0542811101000000123456"
-        saldo: 
-          type: number
-          format: double
-          description: Saldo disponibile in euro
-          example: 1520.75
-        pan:
-          type: string
-          description: Numero carta (PAN)
-          example: "4000123456789012"
-        annoScadenza:
-          type: integer
-          description: Anno di scadenza della carta
-          example: 2035
-        meseScadenza:
-          type: integer
-          description: Mese di scadenza della carta
-          example: 1
-        cvv:
-          type: string
-          description: Codice di sicurezza CVV
-          example: "123"
-        principale:
-          type: boolean
-          description: Indica se è il conto principale dell'utente
-          example: true
-
-    OpzionePrestito:
-      type: object
-      description: Opzione di rimborso per un prestito
-      properties:
-        durataMesi: 
-          type: integer
-          description: Durata del prestito in mesi
-          example: 24
-        tassoInteresseAnnuale: 
-          type: number
-          format: double
-          description: Tasso di interesse annuale in percentuale
-          example: 6.5
-        numeroRate: 
-          type: integer
-          description: Numero di rate mensili
-          example: 24
-        rataMensile: 
-          type: number
-          format: double
-          description: Importo rata mensile in euro
-          example: 356.40
-        importoTotale: 
-          type: number
-          format: double
-          description: Importo totale da restituire
-          example: 8553.60
-
-    PrestitoDTO:
-      type: object
-      description: Dettagli di un prestito attivo
-      properties:
-        idPrestito: 
-          type: integer
-          description: ID univoco del prestito
-          example: 123
-        importoRichiesto: 
-          type: number
-          format: double
-          description: Importo originale del prestito
-          example: 8000
-        numeroRate: 
-          type: integer
-          description: Numero totale di rate
-          example: 36
-        tassoInteresseAnnuale: 
-          type: number
-          format: double
-          description: Tasso di interesse annuale
-          example: 6.9
-        stato: 
-          type: string
-          description: Stato del prestito
-          example: "APPROVATO"
-        rataMensile: 
-          type: number
-          format: double
-          description: Importo della rata mensile
-          example: 245.80
-        residuo: 
-          type: number
-          format: double
-          description: Importo residuo da pagare
-          example: 6789.10
-
     TransazioneDTO:
       type: object
-      description: Dettagli di una singola transazione
+      description: "DTO che rappresenta una transazione bancaria, con importo positivo\
+        \ o negativo a seconda che l'utente sia mittente o destinatario."
       properties:
-        id: 
-          type: integer
-          description: ID univoco della transazione
-          example: 9876
-        data: 
+        descrizione:
+          type: string
+          description: Descrizione o causale della transazione
+          example: Pagamento bolletta luce
+        data:
           type: string
           format: date-time
-          description: Data e ora della transazione
-          example: "2025-10-24T12:30:00Z"
-        importo: 
+          description: Data e ora in cui la transazione è stata effettuata
+          example: 2025-10-29T14:30:00
+        importo:
           type: number
           format: double
-          description: Importo della transazione (negativo se uscita, positivo se entrata)
-          example: -25.50
-        descrizione: 
+          description: "Importo della transazione. Negativo se l'utente è mittente,\
+            \ positivo se destinatario."
+          example: -75.5
+    OpzionePrestito:
+      type: object
+      description: DTO che rappresenta un'opzione di prestito con i dettagli delle
+        rate e dei tassi applicati.
+      properties:
+        numeroRate:
+          type: integer
+          format: int32
+          description: Numero totale delle rate previste per il prestito
+          example: 36
+        rataMensile:
+          type: number
+          format: double
+          description: Importo della singola rata mensile
+          example: 289.5
+        tan:
+          type: number
+          format: double
+          description: Tasso Annuo Nominale (TAN) espresso in percentuale
+          example: 5.5
+        taeg:
+          type: number
+          format: double
+          description: Tasso Annuo Effettivo Globale (TAEG) espresso in percentuale
+          example: 5.8
+        totaleDovuto:
+          type: number
+          format: double
+          description: Importo totale dovuto alla fine del piano di rimborso
+          example: 10422.0
+    PrestitoDTO:
+      type: object
+      description: "DTO che rappresenta un prestito con i dettagli relativi all'importo,\
+        \ ai tassi e allo stato di rimborso."
+      properties:
+        idPrestito:
+          type: integer
+          format: int32
+          description: Identificativo univoco del prestito
+          example: 42
+        importo:
+          type: number
+          format: double
+          description: Importo totale richiesto per il prestito
+          example: 10000.0
+        numeroRate:
+          type: integer
+          format: int32
+          description: Numero totale di rate previste per il rimborso
+          example: 36
+        tan:
+          type: number
+          format: double
+          description: Tasso Annuo Nominale (TAN) espresso in percentuale
+          example: 5.0
+        taeg:
+          type: number
+          format: double
+          description: Tasso Annuo Effettivo Globale (TAEG) espresso in percentuale
+          example: 5.3
+        rataMensile:
+          type: number
+          format: double
+          description: Importo della singola rata mensile
+          example: 300.5
+        importoPagato:
+          type: number
+          format: double
+          description: Importo totale già rimborsato sul prestito
+          example: 1200.0
+    ContoDTO:
+      type: object
+      description: Data Transfer Object che rappresenta un conto bancario dell'utente
+      properties:
+        idConto:
+          type: integer
+          format: int32
+          description: Identificativo univoco del conto
+          example: 101
+        alias:
           type: string
-          description: Causale della transazione
-          example: "Pagamento cena"
-        controparte: 
+          description: Alias o nome personalizzato assegnato al conto
+          example: Conto Principale
+        saldo:
+          type: number
+          format: double
+          description: Saldo corrente del conto
+          example: 1530.75
+        pan:
           type: string
-          description: Username della controparte
-          example: "lbianchi"
-        tipo: 
+          description: Numero PAN della carta associata al conto (parzialmente mascherato)
+          example: 1234-5678-****-9012
+        annoScadenza:
+          type: integer
+          format: int32
+          description: Anno di scadenza della carta
+          example: 2027
+        meseScadenza:
+          type: integer
+          format: int32
+          description: Mese di scadenza della carta
+          example: 12
+        cvv:
           type: string
-          description: Tipo di transazione
-          example: "DEBITO"
+          description: Codice di sicurezza della carta (CVV)
+          example: 123
+        iban:
+          type: string
+          description: IBAN del conto
+          example: IT60X0542811101000000123456
+        principale:
+          type: boolean
+          description: Indica se il conto è il principale per l'utente
+          example: true
