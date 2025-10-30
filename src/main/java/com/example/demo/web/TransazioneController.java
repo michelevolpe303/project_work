@@ -28,7 +28,15 @@ public class TransazioneController {
 
     @Operation(
         summary = "Recupera le transazioni",
-        description = "Restituisce una lista di transazioni per l’utente autenticato, paginata in base al parametro `pagina`."
+        description = """
+        Permette di visualizzare l'elenco delle transazioni effettuate dall'utente autenticato.
+        
+        Il parametro richiesto è pagina, che specifica il numero della pagina da consultare.
+        
+        **Paginazione**:
+        - 10 transazioni per pagina
+        - Ordinate dalla più recente alla più vecchia
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Transazioni recuperate con successo",
@@ -54,7 +62,19 @@ public class TransazioneController {
 
     @Operation(
         summary = "Invia denaro a un altro utente",
-        description = "Permette all’utente autenticato di inviare denaro a un altro utente specificando destinatario, importo e descrizione."
+        description = """
+        Consente all'utente autenticato di inviare una somma di denaro a un altro 
+        utente del sistema.
+        
+        **Parametri necessari**:
+        - destinatario: username del ricevente
+        - importo: somma da trasferire
+        - descrizione: causale (es. "Pagamento cena")
+        
+        **Identificazione destinatario**:
+        - Per IBAN: formato standard italiano
+        - Per alias: nome del conto destinatario
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Transazione eseguita con successo",
