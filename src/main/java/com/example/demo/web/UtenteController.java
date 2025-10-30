@@ -29,7 +29,20 @@ public class UtenteController {
 
     @Operation(
         summary = "Registra un nuovo utente",
-        description = "Crea un nuovo utente con i dati forniti e associa un conto principale con alias scelto."
+        description = """
+        L'endpoint di registrazione consente la creazione di un nuovo utente nel sistema. 
+        Al momento della registrazione, il sistema genera automaticamente un conto corrente 
+        associato all'utente, utilizzando l'alias fornito.
+        
+        **Parametri richiesti**: nome, cognome, username, password e alias
+        
+        **Esempio**: Un utente con nome 'Mario Rossi' potrebbe registrarsi utilizzando 
+        l'identificativo 'mrossi' e creare un conto denominato 'Conto Principale'.
+        
+        **Note**:
+        - La password viene automaticamente hashata con BCrypt
+        - L'username deve essere univoco nel sistema
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Registrazione avvenuta con successo",
