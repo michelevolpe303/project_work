@@ -32,7 +32,18 @@ public class PrestitoController {
 
     @Operation(
         summary = "Calcola le opzioni di prestito disponibili",
-        description = "Restituisce una lista di opzioni di prestito (tasso, rate, importo) in base all'importo richiesto."
+        description = """
+        Il sistema è in grado di calcolare e restituire le diverse opzioni di prestito 
+        disponibili in base all'importo richiesto.
+        
+        La risposta fornisce una lista di oggetti OpzionePrestito, contenente le varie 
+        soluzioni proposte (durata, tasso di interesse, numero di rate).
+        
+        **Calcolo**: 
+        - Opzioni disponibili da 12 a 48 rate (intervalli di 6 mesi)
+        - TAN fisso al 5%
+        - Spese obbligatorie: 2% dell'importo
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Opzioni di prestito disponibili",
@@ -49,7 +60,17 @@ public class PrestitoController {
     
     @Operation(
         summary = "Richiede un prestito",
-        description = "Permette all’utente autenticato di richiedere un prestito specificando importo e numero di rate."
+        description = """
+        Per inoltrare una nuova richiesta di prestito, l'utente invia i parametri 
+        importoRichiesto e numeroRate, che indicano rispettivamente la somma 
+        desiderata e il numero di rate per il rimborso.
+        
+        **Processo**:
+        1. Validazione dei parametri
+        2. Calcolo delle condizioni del prestito
+        3. Creazione del prestito
+        4. Accredito immediato dell'importo sul conto
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Prestito richiesto con successo",
@@ -70,7 +91,12 @@ public class PrestitoController {
 
     @Operation(
         summary = "Lista dei prestiti dell’utente",
-        description = "Restituisce tutti i prestiti associati all’utente autenticato."
+        description = """
+        Consente di ottenere l'elenco completo dei prestiti associati all'utente autenticato.
+        
+        Il sistema restituisce una lista di oggetti PrestitoDTO, ciascuno contenente 
+        i dettagli relativi a un singolo prestito.
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista dei prestiti",
@@ -88,7 +114,15 @@ public class PrestitoController {
 
     @Operation(
         summary = "Paga una rata di un prestito",
-        description = "Permette all’utente di pagare una rata del prestito identificato da `idPrestito`."
+        description = """
+        Per procedere al pagamento di una rata, l'utente specifica l'identificativo 
+        numerico del prestito da aggiornare.
+        
+        **Processo**:
+        1. Verifica che il prestito appartenga all'utente
+        2. Addebita l'importo della rata dal conto attivo
+        3. Aggiorna il totale pagato del prestito
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Rata pagata con successo",
