@@ -27,7 +27,18 @@ public class ContoController {
 
     @Operation(
         summary = "Crea un nuovo conto",
-        description = "Permette la creazione di un nuovo conto per l'utente autenticato tramite username e password."
+        description = """        
+        La creazione di ulteriori conti è possibile tramite questo endpoint.
+        L'operazione richiede l'autenticazione dell'utente mediante username e password, 
+        oltre all'indicazione dell'alias per il nuovo conto.
+        
+        **Esempio**: Creazione di un "Conto Risparmi"
+        
+        **Requisiti**:
+        - Utente deve essere autenticato tramite sessione
+        - Username e password devono corrispondere all'utente autenticato
+        - L'alias deve essere univoco nel sistema
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Conto creato con successo",
@@ -58,7 +69,13 @@ public class ContoController {
 
     @Operation(
         summary = "Cambia conto attivo",
-        description = "Permette di selezionare un conto come attivo tramite alias."
+        description = """
+        Permette di selezionare un conto come attivo tramite alias.
+
+        **Comportamento**: Il conto selezionato diventa quello attivo per tutte le 
+        operazioni successive (transazioni, prestiti, ecc.).
+
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Conto cambiato con successo",
@@ -83,7 +100,13 @@ public class ContoController {
 
     @Operation(
         summary = "Recupera il conto attivo",
-        description = "Restituisce le informazioni relative al conto attualmente selezionato dall’utente autenticato."
+        description = """
+        Consente di ottenere i dettagli relativi al conto attualmente attivo 
+        per l'utente autenticato.
+        
+        La risposta restituisce un oggetto ContoDTO contenente tutte le 
+        informazioni principali del conto.
+        """
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Conto attivo recuperato con successo",
