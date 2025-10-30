@@ -1,15 +1,33 @@
 package com.example.demo.dto;
 
 import com.example.demo.domain.prestito.Prestito;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(
+    name = "PrestitoDTO",
+    description = "DTO che rappresenta un prestito con i dettagli relativi all'importo, ai tassi e allo stato di rimborso."
+)
 public class PrestitoDTO {
 
+    @Schema(description = "Identificativo univoco del prestito", example = "42")
     private Integer idPrestito;
+
+    @Schema(description = "Importo totale richiesto per il prestito", example = "10000.00")
     private double importo;
+
+    @Schema(description = "Numero totale di rate previste per il rimborso", example = "36")
     private Integer numeroRate;
+
+    @Schema(description = "Tasso Annuo Nominale (TAN) espresso in percentuale", example = "5.0")
     private Double tan;
+
+    @Schema(description = "Tasso Annuo Effettivo Globale (TAEG) espresso in percentuale", example = "5.3")
     private Double taeg;
+
+    @Schema(description = "Importo della singola rata mensile", example = "300.50")
     private Double rataMensile;
+
+    @Schema(description = "Importo totale già rimborsato sul prestito", example = "1200.00")
     private double importoPagato;
 
     // Costruttore che prende in input un Prestito
@@ -23,7 +41,7 @@ public class PrestitoDTO {
         this.importoPagato = prestito.getImportoPagato();
     }
 
-    // Getter e setter
+    // Getter e Setter
     public Integer getIdPrestito() {
         return idPrestito;
     }
