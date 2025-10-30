@@ -11,8 +11,19 @@ paths:
       tags:
       - utente-controller
       summary: Registra un nuovo utente
-      description: Crea un nuovo utente con i dati forniti e associa un conto principale
-        con alias scelto.
+      description: |
+        L'endpoint di registrazione consente la creazione di un nuovo utente nel sistema.
+        Al momento della registrazione, il sistema genera automaticamente un conto corrente
+        associato all'utente, utilizzando l'alias fornito.
+
+        **Parametri richiesti**: nome, cognome, username, password e alias
+
+        **Esempio**: Un utente con nome 'Mario Rossi' potrebbe registrarsi utilizzando
+        l'identificativo 'mrossi' e creare un conto denominato 'Conto Principale'.
+
+        **Note**:
+        - La password viene automaticamente hashata con BCrypt
+        - L'username deve essere univoco nel sistema
       operationId: registerUser
       parameters:
       - name: nome
@@ -70,8 +81,16 @@ paths:
       tags:
       - prestito-controller
       summary: Richiede un prestito
-      description: Permette all’utente autenticato di richiedere un prestito specificando
-        importo e numero di rate.
+      description: |
+        Per inoltrare una nuova richiesta di prestito, l'utente invia i parametri
+        importoRichiesto e numeroRate, che indicano rispettivamente la somma
+        desiderata e il numero di rate per il rimborso.
+
+        **Processo**:
+        1. Validazione dei parametri
+        2. Calcolo delle condizioni del prestito
+        3. Creazione del prestito
+        4. Accredito immediato dell'importo sul conto
       operationId: richiediPrestito
       parameters:
       - name: importoRichiesto
@@ -103,8 +122,14 @@ paths:
       tags:
       - prestito-controller
       summary: Paga una rata di un prestito
-      description: Permette all’utente di pagare una rata del prestito identificato
-        da `idPrestito`.
+      description: |
+        Per procedere al pagamento di una rata, l'utente specifica l'identificativo
+        numerico del prestito da aggiornare.
+
+        **Processo**:
+        1. Verifica che il prestito appartenga all'utente
+        2. Addebita l'importo della rata dal conto attivo
+        3. Aggiorna il totale pagato del prestito
       operationId: pagaRata
       parameters:
       - name: idPrestito
@@ -135,8 +160,18 @@ paths:
       tags:
       - transazione-controller
       summary: Invia denaro a un altro utente
-      description: "Permette all’utente autenticato di inviare denaro a un altro utente\
-        \ specificando destinatario, importo e descrizione."
+      description: |
+        Consente all'utente autenticato di inviare una somma di denaro a un altro
+        utente del sistema.
+
+        **Parametri necessari**:
+        - destinatario: username del ricevente
+        - importo: somma da trasferire
+        - descrizione: causale (es. "Pagamento cena")
+
+        **Identificazione destinatario**:
+        - Per IBAN: formato standard italiano
+        - Per alias: nome del conto destinatario
       operationId: inviaDenaro
       parameters:
       - name: destinatario
@@ -181,8 +216,17 @@ paths:
       tags:
       - conto-controller
       summary: Crea un nuovo conto
-      description: Permette la creazione di un nuovo conto per l'utente autenticato
-        tramite username e password.
+      description: |
+        La creazione di ulteriori conti è possibile tramite questo endpoint.
+        L'operazione richiede l'autenticazione dell'utente mediante username e password,
+        oltre all'indicazione dell'alias per il nuovo conto.
+
+        **Esempio**: Creazione di un "Conto Risparmi"
+
+        **Requisiti**:
+        - Utente deve essere autenticato tramite sessione
+        - Username e password devono corrispondere all'utente autenticato
+        - L'alias deve essere univoco nel sistema
       operationId: nuovoConto
       parameters:
       - name: username
@@ -226,8 +270,14 @@ paths:
       tags:
       - transazione-controller
       summary: Recupera le transazioni
-      description: "Restituisce una lista di transazioni per l’utente autenticato,\
-        \ paginata in base al parametro `pagina`."
+      description: |
+        Permette di visualizzare l'elenco delle transazioni effettuate dall'utente autenticato.
+
+        Il parametro richiesto è pagina, che specifica il numero della pagina da consultare.
+
+        **Paginazione**:
+        - 10 transazioni per pagina
+        - Ordinate dalla più recente alla più vecchia
       operationId: getTransazioni
       parameters:
       - name: pagina
@@ -256,8 +306,17 @@ paths:
       tags:
       - prestito-controller
       summary: Calcola le opzioni di prestito disponibili
-      description: "Restituisce una lista di opzioni di prestito (tasso, rate, importo)\
-        \ in base all'importo richiesto."
+      description: |
+        Il sistema è in grado di calcolare e restituire le diverse opzioni di prestito
+        disponibili in base all'importo richiesto.
+
+        La risposta fornisce una lista di oggetti OpzionePrestito, contenente le varie
+        soluzioni proposte (durata, tasso di interesse, numero di rate).
+
+        **Calcolo**:
+        - Opzioni disponibili da 12 a 48 rate (intervalli di 6 mesi)
+        - TAN fisso al 5%
+        - Spese obbligatorie: 2% dell'importo
       operationId: opzioniPrestito
       parameters:
       - name: importo
@@ -280,7 +339,11 @@ paths:
       tags:
       - prestito-controller
       summary: Lista dei prestiti dell’utente
-      description: Restituisce tutti i prestiti associati all’utente autenticato.
+      description: |
+        Consente di ottenere l'elenco completo dei prestiti associati all'utente autenticato.
+
+        Il sistema restituisce una lista di oggetti PrestitoDTO, ciascuno contenente
+        i dettagli relativi a un singolo prestito.
       operationId: getPrestiti
       responses:
         "200":
@@ -294,8 +357,12 @@ paths:
       tags:
       - conto-controller
       summary: Recupera il conto attivo
-      description: Restituisce le informazioni relative al conto attualmente selezionato
-        dall’utente autenticato.
+      description: |
+        Consente di ottenere i dettagli relativi al conto attualmente attivo
+        per l'utente autenticato.
+
+        La risposta restituisce un oggetto ContoDTO contenente tutte le
+        informazioni principali del conto.
       operationId: getConto
       responses:
         "200":
@@ -315,7 +382,12 @@ paths:
       tags:
       - conto-controller
       summary: Cambia conto attivo
-      description: Permette di selezionare un conto come attivo tramite alias.
+      description: |+
+        Permette di selezionare un conto come attivo tramite alias.
+
+        **Comportamento**: Il conto selezionato diventa quello attivo per tutte le
+        operazioni successive (transazioni, prestiti, ecc.).
+
       operationId: cambiaConto
       parameters:
       - name: alias
